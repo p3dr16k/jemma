@@ -22,7 +22,7 @@ var Main = {
 	appIdSmartInfo: null,
 	secretPassPhrase: "289quaoj0u823qejiak289uq3089sfoswfrwefij489fjqepiadmk",
 	enablePV: null,
-	env: 0  //tipo ambiente (0 = sviluppo con console.log, 1 = sviluppo senza console.log, 2 = produzione)
+	env: 1  //tipo ambiente (0 = sviluppo con console.log, 1 = sviluppo senza console.log, 2 = produzione)
 }
 var indicatoreTermometro = null;
 var suffIndicatoreT = '';
@@ -282,6 +282,11 @@ Main.onLoad = function() {
 					GestDate.InitActualDate(Main.InitValue);
 				});
 				InterfaceEnergyHome.mode = -1;
+			} else if(mode == "noservernodev"){
+				LazyScript.load("js/DataSimulNoServer.js", function() {
+					GestDate.InitActualDate(Main.InitValue);
+				});
+				InterfaceEnergyHome.mode = -2;
 			} else {
 				InterfaceEnergyHome.mode = 2;
 			}
@@ -306,7 +311,7 @@ Main.onLoad = function() {
 
 		Main.dataMinima = new Date("January 1, 2010 00:00:00").getTime();
 
-		if ((mode != "simul") && (mode != "noserver")){
+		if ((mode != "simul") && (mode != "noserver") && (mode!="noservernodev")){
 			GestDate.InitActualDate(Main.InitValue);
 		}
 	});
@@ -314,7 +319,7 @@ Main.onLoad = function() {
 
 Main.onUnload = function() {
 	if (GestDate.timerDate != null)
-		clearTimeout(GestDate.timerDate);
+		clearInterval(GestDate.timerDate);
 	if (Main.env == 0) console.log(20, Main.Module, "Main.onUnload");
 	// faccio out da sezione attuale
 	Tracing.Trace(null, Tracing.OUT, null, null);

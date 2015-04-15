@@ -11,15 +11,56 @@ ifBase.init=function(clusters){
         ifBase.stato=-1;
 
         $( "#onoff" ).click(function( event ) {
-                event.preventDefault();
-                var myId= "#"+$(this).attr("id");
+        	
+        	event.preventDefault();
+
+        	 var myId= "#"+$(this).attr("id");
+        	
+        	//fake behavior
+    		if(InterfaceEnergyHome.mode==-2)
+    		{
+    			var pid=$("#Interfaccia").data("pid");
+    			var i= $("#Interfaccia").data("current_index");
+    			if(ifBase.stato==1)
+    			{
+    				
+    				$(myId).addClass("OFF");
+                    $(myId).removeClass("ON");
+    				ifBase.stato=0;
+    				Elettrodomestici.listaElettrodomestici[i].stato=0;
+    				updateFakeDeviceValueByNameAndPID("OnOffState",pid,false);
+    				updateFakeDeviceConsumptionByPid(pid,0);
+    				Elettrodomestici.update();
+
+    				
+    			}else{
+    				msg="ON"
+    				$(myId).addClass("ON");
+                    $(myId).removeClass("OFF");
+    				ifBase.stato=1
+    				Elettrodomestici.listaElettrodomestici[i].stato=1;
+    				updateFakeDeviceValueByNameAndPID("OnOffState",pid,true);
+    				updateFakeDeviceConsumptionByPid(pid,35);
+    				Elettrodomestici.update();
+    			}
+    			
+    			 ifBase.updateIcon(ifBase.stato);
+    			
+    			//$("#device_"+i+" .StatoElettrodomestico .row .stato").html(msg);
+    			
+    			return;
+    		}
+        	
+                
+               
+                var i = $("#Interfaccia").data("current_index");
                 if (ifBase.stato==1) {
                     
                     
                         var pid=$("#Interfaccia").data("pid");
                         if (pid==undefined)
                             return;
-                        if (InterfaceEnergyHome.mode > 0){
+                        if ((InterfaceEnergyHome.mode > 0) || (InterfaceEnergyHome.mode == -1)){
                             InterfaceEnergyHome.objService.setDeviceState(function(result, err){
                               
                                     if (err!=null) {
@@ -31,6 +72,11 @@ ifBase.init=function(clusters){
                                                 $(myId).addClass("OFF");
                                                 $(myId).removeClass("ON");
                                                 ifBase.updateIcon(0);
+                                                $("#device_" + i + " .StatoElettrodomestico .stato").text("OFF");
+                                                $("#device_" + i).removeClass("ON");
+                                                $("#device_" + i).removeClass("OFF");
+                                                $("#device_" + i).removeClass("ONOFF");
+                                                $("#device_" + i).addClass("ONOFF");
                                             }
                                     }
                                     ifBase.timeout_timer=new Date().getTime();
@@ -48,7 +94,7 @@ ifBase.init=function(clusters){
                         var pid=$("#Interfaccia").data("pid");
                         if (pid==undefined)
                                 return;
-                        if (InterfaceEnergyHome.mode > 0){
+                        if ((InterfaceEnergyHome.mode > 0) || (InterfaceEnergyHome.mode == -1)){
                                 InterfaceEnergyHome.objService.setDeviceState(function(result, err){
                                         if (err!=null) {
                                                 ifBase.update(true);
@@ -58,6 +104,11 @@ ifBase.init=function(clusters){
                                                     $(myId).addClass("ON");
                                                     $(myId).removeClass("OFF");
                                                     ifBase.updateIcon(1);
+                                                    $("#device_" + i + " .StatoElettrodomestico .stato").text("ON");
+                                                    $("#device_" + i).removeClass("ONOFF");
+                                                    $("#device_" + i).removeClass("OFF");
+                                                    $("#device_" + i).removeClass("ON");
+                                                    $("#device_" + i).addClass("ON");
                                                 }
                                         }
                                         ifBase.timeout_timer=new Date().getTime();
@@ -91,7 +142,7 @@ ifBase.updateIcon=function(stato){
                 stato=null;
         }
         var i= $("#Interfaccia").data("current_index");
-        var icona_src= "Resources/Images/Devices2/"+Elettrodomestici.getIcon(Elettrodomestici.listaElettrodomestici[i],stato);
+        var icona_src= "Resources/Images/Devices/"+Elettrodomestici.getIcon(Elettrodomestici.listaElettrodomestici[i],stato);
         
         $("#Interfaccia .icona .icona-dispositivo").attr("src",icona_src);
         
@@ -135,9 +186,12 @@ ifBase.update= function(now){
         
         var class_stato="NP"
         var _stato="";
-        
+               
         if (Elettrodomestici.listaElettrodomestici[i].connessione==2) {
                 
+        		console.debug("STATOOO!");
+        		console.debug(Elettrodomestici.listaElettrodomestici[i].stato==1)
+        	
                 if (Elettrodomestici.listaElettrodomestici[i].stato==1){
                         _stato="ON";
                         class_stato="ON";

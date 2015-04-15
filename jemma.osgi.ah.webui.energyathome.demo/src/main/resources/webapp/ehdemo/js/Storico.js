@@ -238,6 +238,7 @@ Storico.VisStorico = function(tipo) {
 		$("#MsgStorico").hide();
 		if (Main.env == 0) console.log(40, Storico.MODULE, "VisStorico : nessun dato");
 		$("#StoricoGraph").html("<div id='StoricoVuotoTitolo'>" + titolo + "</div>" + "<div id='StoricoVuoto'>" + Msg.home["noGrafStorico"] + "</div>");
+		hideSpinner();
 		return;
 	}
 
@@ -285,7 +286,7 @@ Storico.VisStorico = function(tipo) {
 				Storico.datiConsumoNulli = true;
 			}
 		} else {
-			if ((limitOdierno) && (i > limitOdierno)){
+			if ((limitOdierno) && (i >= limitOdierno)){
 				/*if (dati2[i] == null) {
 					dati2[i] = 0;
 				}*/
@@ -309,7 +310,7 @@ Storico.VisStorico = function(tipo) {
 					Storico.datiCostoNulli = true;
 				}
 			} else {
-				if ((limitOdierno) && (i > limitOdierno)){
+				if ((limitOdierno) && (i >= limitOdierno)){
 					dati2[i] = 0;
 					//dati1[i] = 0;
 				} else {
@@ -724,10 +725,11 @@ Storico.DatiCostoStorico = function(val) {
 
 Storico.DatiProduzioneStorico = function(val) {
 	if (Main.env == 0) console.log('datiCosti Costi dal server', val);
+	/*
 	if (val != null){
 		for (var i=0;i<val.length;i++)
 			val[i] = val[i] * 10;
-	}
+	}*/
 	
 	Storico.datiProduzione = val;
 	if (val == null){
@@ -752,13 +754,6 @@ Storico.GetStorico = function() {
 	Storico.device = Storico.GetDispId(Storico.dispositivoScelto);
 	if (Main.env == 0) console.log(80, Storico.MODULE, "Periodo: pid = " + Storico.device + " inizio = " + Storico.dataInizio.toString() + " fine = " + Storico.dataFine.toString());
 
-	// Nella prima fase del trial gestisco solo i dati del consumo
-	/*
-	 * if (InterfaceEnergyHome.mode == InterfaceEnergyHome.MODE_FULL)
-	 * InterfaceEnergyHome.GetStorico("Consumo", Storico.device,
-	 * Storico.dataInizio, Storico.dataFine, Storico.periodoScelto,
-	 * Storico.DatiConsumoStorico); else
-	 */
 	if (Main.enablePV){
 		//ToDo: evitare se device diverso da SmartInfo
 		if ((Storico.device == 0) || (Storico.device == null)){
@@ -779,7 +774,11 @@ Storico.GetDispId = function(nomeElettr) {
 				if (Storico.datiElettr[i].tipo == InterfaceEnergyHome.SMARTINFO_APP_TYPE){
 					rtnResult =  null;
 				} else {
-					rtnResult =  Storico.datiElettr[i].pid;
+					if (InterfaceEnergyHome.mode == -1) {
+						rtnResult = 1;
+					} else {
+						rtnResult = Storico.datiElettr[i].pid;
+					}
 				}
 			}
 		}
@@ -955,11 +954,13 @@ Storico.Precedente = function() {
 
 // imposta periodo successivo in base al tipo di periodo scelto ed esegue richiesta
 Storico.Successivo = function() {
+	
 	if (Main.env == 0) console.log(20, Storico.MODULE, "=========== Successivo: periodoScelto = " + Storico.periodoScelto);
 	switch (Storico.periodoScelto) {
 		case Storico.GIORNO:
 			Storico.dataInizio.setDate(Storico.dataInizio.getDate() + 1);
 			Storico.dataFine.setDate(Storico.dataFine.getDate() + 1);
+			
 			break;
 		case Storico.SETTIMANA:
 			Storico.dataInizio.setDate(Storico.dataInizio.getDate() + 7);
@@ -987,6 +988,9 @@ Storico.Successivo = function() {
 	} else {
 		$("#Succ").show();
 	}
+	console.debug(Storico.periodoScelto)
+	console.debug(Storico.dataInizio);
+	console.debug(Storico.dataFine);
 	Storico.GetStorico();
 }
 
@@ -1002,7 +1006,8 @@ Storico.VisScelta = function() {
 											  .attr('value', Msg.home["tuttiStorico"])
 											  .append(Msg.home["tuttiStorico"]);*/
 	tutti = "<input class='ButtonScelta' name='Dispositivo' type='radio' checked='checked' value='" + Msg.home["tuttiStorico"] + "'>" + Msg.home["tuttiStorico"];
-	if (Storico.datiElettr != null) {
+	
+	if (Storico.datiElettr != null && Storico.datiElettr.length > 0) {
 		for (i = 0; i < Storico.datiElettr.length; i++) {
 			// creo elenco dei dispositivi selezionabili
 			if (Storico.datiElettr[i].tipo == InterfaceEnergyHome.SMARTINFO_APP_TYPE) {
@@ -1027,8 +1032,11 @@ Storico.VisScelta = function() {
 		listaDisp = tutti + tmp;
 		$("#SceltaDispositivo").html(listaDisp);
 	} else {
-		$("#SceltaDispositivo").html("<input class='ButtonScelta' name='Dispositivo' type='radio' checked='checked' value='" + Msg.home["tuttiStorico"] + "'>" + Msg.home["tuttiStorico"]);
+		// $("#SceltaDispositivo").html("<input class='ButtonScelta' name='Dispositivo' type='radio' checked='checked' value='" + Msg.home["tuttiStorico"] + "'>" + Msg.home["tuttiStorico"]);
+		//InterfaceEnergyHome.objService.getNoServerCustomDevice(Storico.GestStoricoList);
+		Storico.GestStoricoList(fakeValues.noServerCustomDevice, null);
 	}
+	
 	Storico.periodoScelto = Storico.GIORNO;
 	Storico.tipoUltimoPeriodo = Storico.GIORNO;
 	Storico.dispositivoScelto = Msg.home["tuttiStorico"];
@@ -1050,6 +1058,7 @@ Storico.VisScelta = function() {
 		if (Main.env == 0) console.log(40, Storico.MODULE, "VisStorico : nessun dato");
 		$("#StoricoGraph").html($(document.createElement('div')).attr('id', 'StoricoVuoto').text(Msg.home["noGrafStorico"]));
 		//$("#StoricoGraph").html("<div id='StoricoVuoto'>" + Msg.home["noGrafStorico"] + "</div>");
+		hideSpinner();
 		return;
 	}
 
@@ -1069,6 +1078,80 @@ Storico.VisScelta = function() {
 
 	// visualizza grafico per valori di default
 	Storico.GetStorico();
+}
+
+Storico.GestStoricoList = function(res, err)
+{
+	if(!err) {
+		if(res.list.length > 0) {
+
+			var tmpArr = new Array();
+			
+			var listaDisp = "<input class='ButtonScelta' name='Dispositivo' type='radio' checked='checked' value='" + Msg.home["tuttiStorico"] + "'>" + Msg.home["tuttiStorico"] ;
+			var arrElettr = new Array();
+			$.each(res.list, function(indice, elettrodom) {		
+				var nomeTmp = elettrodom["map"]["nome"];								
+				if (elettrodom["map"][InterfaceEnergyHome.ATTR_APP_CATEGORY] != "12" &&
+						elettrodom["map"][InterfaceEnergyHome.ATTR_APP_CATEGORY] != "14") 
+				{
+					// Qui aggiungo gli elementi della choice associati ai device fake ...
+					listaDisp += "<br><input class='ButtonScelta' name='Dispositivo' type='radio' value='" + nomeTmp + "'>" + nomeTmp;
+					
+				}
+				var tmpObj = new Object();
+				tmpObj.nome = nomeTmp;
+				tmpObj.pid = elettrodom["map"][InterfaceEnergyHome.ATTR_APP_PID];
+				tmpObj.tipo = elettrodom["map"][InterfaceEnergyHome.ATTR_APP_TYPE];
+				tmpArr.push(tmpObj);
+			});
+			
+			Storico.DatiElettr(tmpArr);
+			
+			$("#SceltaDispositivo").html(listaDisp);
+			
+			Storico.periodoScelto = Storico.GIORNO;
+			Storico.tipoUltimoPeriodo = Storico.GIORNO;
+			Storico.dispositivoScelto = Msg.home["tuttiStorico"];
+			if (Main.env == 0) console.log(80, Storico.MODULE, "dispositivoScelto = " + Storico.dispositivoScelto + " periodoScelto = " + Storico.periodoScelto);
+
+			// metto data inizio e fine = ieri
+			Storico.dataFine = new Date(GestDate.GetActualDate().getTime());
+			Storico.dataFine.setDate(Storico.dataFine.getDate() - 1);
+			Storico.dataFine.setHours(23);
+			Storico.dataFine.setMinutes(59);
+			Storico.dataInizio = new Date(Storico.dataFine.getTime());
+			Storico.dataInizio.setHours(0);
+			Storico.dataInizio.setMinutes(0);
+
+			// gestisco caso giorno installazione == oggi, non ho dati nello storico
+			if ((Storico.dataInizio.getTime() < Storico.installData.getTime()) && (Storico.dataFine.getTime() < Storico.installData.getTime())) {
+				$("#Prec").hide();
+				$("#Succ").hide();
+				if (Main.env == 0) console.log(40, Storico.MODULE, "VisStorico : nessun dato");
+				$("#StoricoGraph").html($(document.createElement('div')).attr('id', 'StoricoVuoto').text(Msg.home["noGrafStorico"]));
+				//$("#StoricoGraph").html("<div id='StoricoVuoto'>" + Msg.home["noGrafStorico"] + "</div>");
+				hideSpinner();
+				return;
+			}
+
+			// imposta gestione scelta
+			$("input[type=radio][name='Periodo']").change(Storico.SceltaPeriodo);
+			$("input[type=radio][name='Dispositivo']").change(Storico.SceltaDispositivo);
+
+			// gestisce frecce
+			// per funzionare su iPad devo mettere un div sopra l'immagine della freccia
+			// se non non e' cliccabile
+			//$("#Prec").click(Storico.Precedente);
+			//$("#Succ").click(Storico.Successivo);
+			if (Storico.dataInizio.getTime() < Storico.installData.getTime()){
+				$("#Prec").hide();
+				// $("#Succ").hide();
+			}
+
+			// visualizza grafico per valori di default
+			Storico.GetStorico();
+		}
+	}	
 }
 
 /*******************************************************************************

@@ -64,6 +64,7 @@ ConfMain.onLoad = function() {
 				}, 60000);
 			});
 }
+/*
 
 ConfMain.onLoadConfParam = function() {
 
@@ -103,11 +104,11 @@ ConfMain.onLoadConfParam = function() {
 	$("#Content").hide();
 	$("#MainMenu").hide();
 	$("#ContentMenu").hide();
-}
+}*/
 
 ConfMain.onUnload = function() {
 	if (GestDate.timerDate != null)
-		clearTimeout(GestDate.timerDate);
+		clearInterval(GestDate.timerDate);
 
 	InterfaceEnergyHome.removeListener("service.error", Configurazione.HandleError);
 

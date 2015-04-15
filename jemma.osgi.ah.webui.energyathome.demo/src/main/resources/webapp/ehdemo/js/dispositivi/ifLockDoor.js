@@ -26,7 +26,7 @@ ifLockDoor.init=function(clusters, i){
             var pid = $("#Interfaccia").data("pid");
             if (pid == undefined)
                 return;
-            if (InterfaceEnergyHome.mode > 0){
+            if ((InterfaceEnergyHome.mode > 0) || (InterfaceEnergyHome.mode == -1)){
                 InterfaceEnergyHome.objService.setDeviceState(function(result, err){
                   
                     if (err!=null) {
@@ -57,7 +57,7 @@ ifLockDoor.init=function(clusters, i){
             var pid = $("#Interfaccia").data("pid");
             if (pid == undefined)
                     return;
-            if (InterfaceEnergyHome.mode > 0){
+            if ((InterfaceEnergyHome.mode > 0) || (InterfaceEnergyHome.mode == -1)){
                 InterfaceEnergyHome.objService.setDeviceState(function(result, err){
                     if (err!=null) {
                         ifLockDoor.update(ifLockDoor.DOORLOCK_OPEN_STATE);
@@ -85,7 +85,7 @@ ifLockDoor.init=function(clusters, i){
         	var pid = $("#Interfaccia").data("pid");
             if (pid == undefined)
                 return;
-            if (InterfaceEnergyHome.mode > 0){
+            if ((InterfaceEnergyHome.mode > 0) || (InterfaceEnergyHome.mode == -1)){
                 InterfaceEnergyHome.objService.setDeviceState(function(result, err){
                   
                     if (err!=null) {
@@ -135,7 +135,7 @@ ifLockDoor.updateIcon=function(stato){
             stato=null;
     }
     var i= $("#Interfaccia").data("current_index");
-    var icona_src= "Resources/Images/Devices2/"+Elettrodomestici.getIcon(Elettrodomestici.listaElettrodomestici[i], stato);
+    var icona_src= "Resources/Images/Devices/"+Elettrodomestici.getIcon(Elettrodomestici.listaElettrodomestici[i], stato);
     
     $("#Interfaccia .icona .icona-dispositivo").attr("src",icona_src);
     $("#device_" + ifLockDoor.counterPositionDevice + " .IconaElettrodomestico .icona-dispositivo").attr("src", icona_src);
@@ -158,11 +158,11 @@ ifLockDoor.updateIcon=function(stato){
 ifLockDoor.update= function(now){
     var t= new Date().getTime();
     var i= $("#Interfaccia").data("current_index");
-    var device_value = Elettrodomestici.listaElettrodomestici[i].device_value;
+    var device_value = Elettrodomestici.listaElettrodomestici[i].lockState;
     var txtValue = null;
     
     if (now != null){
-    	if ((now != true) && (now != false))
+    	if ((now !== true) && (now !== false))
     		device_value = now;
     }
     if (device_value == 2) {

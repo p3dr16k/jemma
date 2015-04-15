@@ -44,6 +44,8 @@ import org.energy_home.jemma.ah.hac.lib.ext.IApplianceConfiguration;
 import org.energy_home.jemma.ah.hac.lib.ext.IAppliancesProxy;
 import org.energy_home.jemma.ah.hac.lib.ext.INetworkManager;
 import org.energy_home.jemma.ah.hac.lib.ext.TextConverter;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -250,6 +252,15 @@ public class HacWebCommandProvider extends org.apache.felix.webconsole.AbstractW
 						appliance = (IAppliance) iterator.next();
 						renderAppliance(appRoot, installing, false, appliance, pw);
 					}
+					pw.println("<br/>");
+					String gitVersion=getGitBuildNumber();
+					LOG.debug("GIT VERSION: {}",gitVersion);
+					if(gitVersion!=null)
+					{
+						pw.println("Git version: <a href=\"https://github.com/ismb/jemma/commit/"+gitVersion+"\">"+gitVersion+"</a>");
+					}else{
+						pw.println("Git version: UNKNOWN");
+					}
 				}
 			} else if (pathInfo.startsWith("/config")) {
 				st = new StringTokenizer(pathInfo, "/");
@@ -308,10 +319,24 @@ public class HacWebCommandProvider extends org.apache.felix.webconsole.AbstractW
 				} else {
 					renderClusterCommands(appRoot, config, appliance.getEndPoint(endPointId), clusterName, methodName, params, pw);
 				}
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private String getGitBuildNumber() {
+		Bundle[] allBundles=FrameworkUtil.getBundle(this.getClass()).getBundleContext().getBundles();
+		//find the jemma.osgi.ah.bundle and get property Implementation-Version value
+		for(int i=0;i<allBundles.length;i++)
+		{
+			if(allBundles[i].getSymbolicName().equals("jemma.osgi.ah.app"))
+			{
+				return allBundles[i].getHeaders().get("Implementation-Version");
+			}
+		}
+		return null;
 	}
 	
 	private void renderAppliance(String appRoot, boolean installing, boolean details, IAppliance appliance, PrintWriter pw) {

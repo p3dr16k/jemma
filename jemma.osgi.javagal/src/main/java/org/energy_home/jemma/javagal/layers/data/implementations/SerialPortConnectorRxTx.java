@@ -158,7 +158,10 @@ public class SerialPortConnectorRxTx implements IConnector {
 			if (ou != null) {
 				try {
 					LOG.debug(">>> Sending: " + buff.ToHexString());
-					ou.write(buff.getArray(), 0, buff.getCount(true));
+					synchronyzed(ou)
+					{
+						ou.write(buff.getArray(), 0, buff.getCount(true));
+					}
 					if(DataLayer.getPropertiesManager().getzgdDump())
 					{
 						String directory = DataLayer.getPropertiesManager().getDirDump();
@@ -230,21 +233,23 @@ public class SerialPortConnectorRxTx implements IConnector {
 
 		public void serialEvent(SerialPortEvent event) {
 			try {
-
-				if ((event.getEventType() == SerialPortEvent.DATA_AVAILABLE) && !getIgnoreMessage()) {
-					int numberOfBytes = in.available();
-					if (numberOfBytes > 0) {
-						byte[] bufferOriginal = new byte[numberOfBytes];
-						in.read(bufferOriginal);
-						ByteArrayObject frame = new ByteArrayObject(bufferOriginal, numberOfBytes);
-						_caller.getDataLayer().notifyFrame(frame);
-						if(DataLayer.getPropertiesManager().getzgdDump())
-						{
-							String directory = DataLayer.getPropertiesManager().getDirDump();
-							String fileName = System.currentTimeMillis() + "-r.bin";
-							dumpToFile(directory + File.separator + fileName, bufferOriginal);
+				synchronized(in)
+				{
+					if ((event.getEventType() == SerialPortEvent.DATA_AVAILABLE) && !getIgnoreMessage()) {
+						int numberOfBytes = in.available();
+						if (numberOfBytes > 0) {
+							byte[] bufferOriginal = new byte[numberOfBytes];
+							in.read(bufferOriginal);
+							ByteArrayObject frame = new ByteArrayObject(bufferOriginal, numberOfBytes);
+							_caller.getDataLayer().notifyFrame(frame);
 						}
 					}
+				}
+				if(DataLayer.getPropertiesManager().getzgdDump())
+				{
+						String directory = DataLayer.getPropertiesManager().getDirDump();
+						String fileName = System.currentTimeMillis() + "-r.bin";
+						dumpToFile(directory + File.separator + fileName, bufferOriginal);
 				}
 
 			} catch (Exception e) {

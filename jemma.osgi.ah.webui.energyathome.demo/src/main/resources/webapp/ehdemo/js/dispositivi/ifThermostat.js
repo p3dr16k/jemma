@@ -21,7 +21,7 @@ ifThermostat.updateIcon=function(stato){
                 stato=null;
         }
         var i= $("#Interfaccia").data("current_index");
-        var icona_src= "Resources/Images/Devices2/"+Elettrodomestici.getIcon(Elettrodomestici.listaElettrodomestici[i],stato);
+        var icona_src= "Resources/Images/Devices/"+Elettrodomestici.getIcon(Elettrodomestici.listaElettrodomestici[i],stato);
         
         $("#Interfaccia .icona .icona-dispositivo").attr("src",icona_src);
         
@@ -45,11 +45,11 @@ ifThermostat.update= function(now){
         
         var i= $("#Interfaccia").data("current_index");
 
-        var consumo=Elettrodomestici.listaElettrodomestici[i].consumo;
-        if (consumo!="n.a.") {
-                consumo=Math.round(Elettrodomestici.listaElettrodomestici[i].consumo)+"W";
-        }
-        $("#Interfaccia .StatoElettrodomestico .consumo").text(consumo);
+        //var consumo=Elettrodomestici.listaElettrodomestici[i].consumo;
+        //if (consumo!="n.a.") {
+        //        consumo=Math.round(Elettrodomestici.listaElettrodomestici[i].consumo)+"W";
+        //}
+        //$("#Interfaccia .StatoElettrodomestico .consumo").text(consumo);
         $("#Interfaccia .StatoElettrodomestico .posizione_value").text(Elettrodomestici.locazioni[Elettrodomestici.listaElettrodomestici[i].location]);
         
         
@@ -63,21 +63,18 @@ ifThermostat.update= function(now){
         
         ifThermostat.timeout_timer=t;
         
-        var class_stato="NP"
-        var t_value="";
-        var h_value="";
+        var class_stato = "NP"
+        var t_value = "n.a.";
+        var h_value = "n.a.";
+        ifThermostat.stato = -1;
         
         if (Elettrodomestici.listaElettrodomestici[i].connessione==2) {
                 
                 ifThermostat.stato=1;
-                //_value=Elettrodomestici.listaElettrodomestici[i].consumo_value;
-                t_value=Elettrodomestici.listaElettrodomestici[i].temperature+" °";
-                h_value=Elettrodomestici.listaElettrodomestici[i].humidity+" %"
-                
-        }else{
-                t_value="n.a.";
-                h_value="n.a.";
-                ifThermostat.stato=-1;
+                if (Elettrodomestici.listaElettrodomestici[i].temperature != undefined)
+                	t_value=Elettrodomestici.listaElettrodomestici[i].temperature+" C";
+                if (Elettrodomestici.listaElettrodomestici[i].humidity != undefined)
+                	h_value=Elettrodomestici.listaElettrodomestici[i].humidity+" %"
         }
         
         $("#Interfaccia #Temperatura #temperatura_value").text(t_value);

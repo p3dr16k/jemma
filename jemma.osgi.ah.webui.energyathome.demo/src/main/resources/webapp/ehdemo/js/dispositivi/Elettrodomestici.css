@@ -7,7 +7,7 @@
     padding: 10px;
     background-color: #333;
     font-family: Arial, sans-serif;
-    font-size: 12px;
+    font-size: 1vw;
     position: relative;
     top: 4%;
     float: right;
@@ -97,7 +97,8 @@
 
 .Elettrodomestico{
     height: 100%;
-    width: 12.5%;
+    /*width: 12.5%;*/
+    width: 15%;
     float: left;
     
 }
@@ -137,18 +138,35 @@
      color: #000;
 }
 
+.Elettrodomestico.ONOFF .NomeElettrodomestico{
+     background-color: #9cc31c;
+     color: #000;
+}
+
 .Elettrodomestico.ON .DatiElettrodomestico, .Elettrodomestico.OFF .DatiElettrodomestico{
     cursor: pointer;
 }
 
+.Elettrodomestico.ONOFF .DatiElettrodomestico, .Elettrodomestico.OFFON .DatiElettrodomestico{
+    cursor: pointer;
+}
 
 .Elettrodomestico.ON:hover .DatiElettrodomestico,.Elettrodomestico.OFF:hover .DatiElettrodomestico{
     background-color: #252525;
     /*border: 2px #000 solid;*/
 }
 
+.Elettrodomestico.ONOFF:hover .DatiElettrodomestico,.Elettrodomestico.OFFON:hover .DatiElettrodomestico{
+    background-color: #252525;
+    /*border: 2px #000 solid;*/
+}
 
 .Elettrodomestico.OFF .NomeElettrodomestico{
+     background-color: #808080;
+     color: #fff;
+}
+
+.Elettrodomestico.OFFON .NomeElettrodomestico{
      background-color: #808080;
      color: #fff;
 }
@@ -172,7 +190,22 @@
     
 }
 
+.Elettrodomestico.ONOFF .IconaElettrodomestico{
+    background-image: url("bg_icon_blue.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-origin: content-box;
+    
+}
+
 .Elettrodomestico.OFF .IconaElettrodomestico{
+    background-image: url("bg_icon_gray.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-origin: content-box;
+}
+
+.Elettrodomestico.OFFON .IconaElettrodomestico{
     background-image: url("bg_icon_gray.png");
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -218,6 +251,7 @@
     display: block;
     width: 60%;
     height: 98%;
+    font-size: 1vw;
     overflow: hidden;
 }
 .StatoElettrodomestico .row .right{
@@ -255,10 +289,16 @@
     color: #800000;
 }
 
-
+.Elettrodomestico.OFFON .StatoElettrodomestico .row .right.stato{
+    color: #008000;
+}
 
 .Elettrodomestico.ON .StatoElettrodomestico .row .right.stato{
     color: #008000;
+}
+
+.Elettrodomestico.ONOFF .StatoElettrodomestico .row .right.stato{
+    color: #800000;
 }
 
 .Elettrodomestico.NONPRESENTE .StatoElettrodomestico .row, .Elettrodomestico.NONPRESENTE .StatoElettrodomestico .row .right{

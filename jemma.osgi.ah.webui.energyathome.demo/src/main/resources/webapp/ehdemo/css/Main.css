@@ -125,6 +125,14 @@ span {
 	height: 8%;
 }
 
+#ContentMenuConf {
+	position: absolute;
+	left: 16%;
+	top: 88%;
+	width: 33%;
+	height: 8%;
+}
+
 #Content {
 	position: absolute;
 	left: 15%;
@@ -183,9 +191,8 @@ span {
 }
 
 #NonDisponibile {
-	position: absolute;
 	color: #abd037;
-	font-size: 2.0em;
+	font-size: 2.0vw;
 	text-align:center;
 	overflow: hidden;
 	padding-top:20%;
@@ -240,9 +247,9 @@ span {
     overflow:hidden;
     background-color: transparent;
     text-align: center;
-	font-size: 1.0em;
+	font-size: 0.5em;
 	font-weight: bold;
-	color: red;
+	color: rgb(124, 124, 124);
 	z-index: 1000;
 }
 
